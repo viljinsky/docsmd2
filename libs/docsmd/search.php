@@ -4,10 +4,11 @@
     
     include './pattern.php';
     
-    function fsearch($word){
+    function search(){
+        global $map;
         
-        global $content_path,$doc_page,$map;
-
+        $word = urldecode(filter_input(INPUT_POST,'search'));
+        
         echo 'Вы искали <strong>'.$word.'</strong><br>';
         $count = 0;
         if (strlen($word)>0){
@@ -15,13 +16,13 @@
             foreach ($map as $value){
                 $page = $value['page'];
 
-                $filename = $content_path.$page.'.md';
+                $filename = CONTENT_PATH.$page.'.md';
                 if (file_exists($filename)){
                     $txt = mb_strtolower(file_get_contents($filename),'UTF-8');
 
                     if (preg_match("/$word/", $txt,$matches)>0){
                         $count++;
-                        echo '<div class="search-item"><a href="'.$doc_page.'?page='.$value['page'].'">'.$value['title'].'</a><br>';
+                        echo '<div class="search-item"><a href="'.DOC_PAGE.'?page='.$value['page'].'">'.$value['title'].'</a><br>';
                         echo print_r($matches);
                         echo "<br><br>";
                         echo $txt;
@@ -35,6 +36,6 @@
 
     }
     
-    $search = urldecode(filter_input(INPUT_GET,'search'));
-    fsearch($search);
+    
+    search();
     

@@ -1,7 +1,4 @@
 <?php
-  
-//    include './proc.php';
-    
     
     define('CR',"\n\r");
     define('TAB',"\t");

@@ -21,15 +21,17 @@ function Request(callback){
 /**     Поиск по документации 
  * 
  **/
-function Search(search_form,result,path){
+function Search(search_form,result,php_path){
     if (search_form!==null){
 
         search_form.onsubmit = function(){
             var request = Request(function(){
                 result.innerHTML = request.responseText;
             });
-            request.open('GET', path+'search.php?search='+this.search.value);
-            request.send();
+            request.open('POST', php_path+'/search.php');
+            var data = new FormData(this);
+            data.append('command','search');
+            request.send(data);
             return false;
         };
     }
@@ -59,13 +61,14 @@ function Editor(element,options){
     var page        = options['page'];
     var linktpl     = options['linktpl'];
     var contentlink = options['contentlink'];
-    var upload_php  = options['upload_php'];
+    var php_path  = options['php_path'];
 
     var form;
     var self=this;
 
     this.save = function(){
         var request = Request( function(text){
+            console.log(text)
             var a = JSON.parse(text);
             if (a['error']===0){
                 document.body.removeChild(form);
@@ -76,8 +79,7 @@ function Editor(element,options){
 
         });
 
-        request.open('POST',upload_php);
-        request.setRequestHeader('enctype','multipart/form-data');
+        request.open('POST',php_path+'proc.php');
         request.send(new FormData(form));
     };
 
@@ -90,11 +92,12 @@ function Editor(element,options){
         form = document.createElement('form');
         form.className='editor';
         form.innerHTML =
-                '<div><input name="filename"></div>'
+                '<div><input name="filename"><input name="command"></div>'
                 +'<div><textarea name="text" cols="100" rows="25"></textarea></div>'
                 +'<div style="float:right;"><button data-action="save">Сохранить</button>'
                 +'<button data-action="cancel">Отмена</button></div>';
         form.filename.value=filename;
+        form.command.value="upload_page";
         form.text.innerHTML = text;
         form.onclick=function(event){
             var target = event.target;

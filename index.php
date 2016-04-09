@@ -53,7 +53,7 @@ and open the template in the editor.
                     page        : '<?=$page?>.md',
                     linktpl     : '<?=LINK_TPL?>',   
                     contentlink : '<?=$server_link.'/docs/'?>',
-                    upload_php  : '<?=$php_path.'upload.php'?>'
+                    php_path    : '<?=$php_path?>'
                     });
                     
         </script>
