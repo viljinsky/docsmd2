@@ -115,7 +115,7 @@ function DocManager(comments,options){
             alert('Какая-то ошибка!\n'+text);
             
         });
-        request.open('POST',php_path+'add_screenshort.php');
+        request.open('POST',php_path+'proc.php' );//'add_screenshort.php');
         request.setRequestHeader('enctype','multipart/form-data');
         request.send(new FormData(form));
     }
@@ -124,10 +124,11 @@ function DocManager(comments,options){
         var form = document.createElement('form');
         form.method='POST';
         form.className='upload_screenshort';
-        form.action=php_path+'add_screenshort.php';
+        form.action=php_path+'proc.php';//'add_screenshort.php';
         form.enctype="multipart/form-data";
         
         form.innerHTML= '<div><input type="file" name="screenshort" required></div>'
+                       +'<input name="command">' 
                        +'item_id <input name="item_id">' 
                        +'<div style="float:right;">'
                        +'<input type="submit" value="Загрузить">'
@@ -135,6 +136,7 @@ function DocManager(comments,options){
                        +'</div>';
                
         form.item_id.value = item_id;// element.item_id.value;       
+        form.command.value='upload_attach';
         element.appendChild(form);
         form.onclick=function(event){
             if (event.target.tagName==='BUTTON'){
@@ -254,14 +256,15 @@ function DocManager(comments,options){
             document.body.appendChild(form);
         });
         
-        request.open('GET',php_path+'quotes.php?item_id='+comment_id);
-        request.send();
+        request.open('POST',php_path+'proc.php');
+        request.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+        request.send('command=quotes&item_id='+comment_id);
         
     };
     
     this.replay_comment=function(comment_item){        
         var comment_id = comment_item.children[0].getAttribute('data-comment-id');
-        form = editForm(document.body,'add',function(f){
+        form = editForm(document.body,'replay',function(f){
             
             var request = Request(function(text){
                 var d = document.createElement('div');

@@ -36,6 +36,5 @@
     }
     
     $search = urldecode(filter_input(INPUT_GET,'search'));
-//    if (!isset($word)){ $word='поиск';}
     fsearch($search);
     
