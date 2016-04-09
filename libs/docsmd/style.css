@@ -1,0 +1,35 @@
+body {font-family: Arial;color:#444;}
+a {color: #5555dd; text-decoration: none;}
+a:hover{text-decoration: underline;}
+.page-navigator{list-style: none;}
+.page-navigator li{display: inline-block;padding: 10px;}
+
+
+.warning{padding:20px;background:#ccc;}
+.attantion{padding:20px;background:#f0f0f0;}
+
+.comment-item {padding: 20px;margin: 0 auto; border:1px solid #ccc;margin-bottom: 5px;}
+.comment-item ul {list-style: none;}
+.comment-item .btn {display: inline-block;margin-right: 10px;cursor: pointer;}
+.comment-item .btn:hover{text-decoration: underline; color:#5555dd;}
+.comment-item-header,.comment-item-footer {color:#ccc; font-size: small;}
+[data-replay-to]{margin-left: 50px;}
+
+.comment-buttons {position: absolute ; right: 0; top:0;}
+
+img {max-width: 90%;}
+blockquote {background: #f0f0f0; padding: 10px; border: 1px solid #ccc;}
+
+.upload_screenshort{ position: fixed;top:100px;left:100px;padding: 20px;border: 1px solid #ccc;background: #fff; box-shadow: 0 0 10px rgba(0,0,0,.5) ;}
+
+pre { padding: 10px; border: 1px solid #ccc;background: #f0f0f0;}
+
+.form-message{position: fixed;left: 100px;top:100px;border: 1px solid #ccc;box-shadow: 0 0 10px rgba(0,0,0,.5);padding: 10px; background: #fff;}
+
+.search-form {border: 1px solid #ccc; padding: 10px;float: right;}
+.search-item {border:1px solid #ccc; width: 90%;margin: 0 auto;padding: 20px;margin-bottom: 20px;}
+
+.docpage {padding-left: 20px;padding-right: 20px;}
+.comments {padding-left: 20px;padding-right: 20px;}
+
+.editor {position: fixed;left: 10px;top:10px;padding: 20px;background: #ccc;}
