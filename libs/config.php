@@ -40,7 +40,7 @@ $image_path = CONTENT_PATH.'images'.DIRECTORY_SEPARATOR;
 define('LINK_TPL', 'link.tpl');
 
 /** Имя файла для храннеия контекста документации */
-define('CONTENT_TPL','content2.tpl' );
+define('CONTENT_TPL','content.tpl' );
 
 /** Имя страницы документации по умолчанию */
 define('DEFAULT_MD','index');

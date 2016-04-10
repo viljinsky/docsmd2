@@ -83,4 +83,17 @@
         return $map;
     }
 
+    function getContent($map,$serch){
+        $result = '';
+        foreach ($map as $a):
+            if ($a['parent']===$serch):
+                $result .= '* ['.$a['title'].']['.$a['page'].']'."\n";
+            endif;
+        endforeach;
+        if (strlen($result)>0){
+            $result = CR.CR."В этой главе следующие разделы".CR.CR.$result;
+        }
+        return $result;
+    }
+    
 

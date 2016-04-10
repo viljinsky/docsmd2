@@ -80,6 +80,7 @@ upload_time timestamp default current_timestamp,
 constraint fk_images_topic_item foreign key (item_id) references topic_item(item_id) on delete cascade
 );
 
+--   тест дата
 
 insert into user_role values (0,'guest'),
     (3,'admin'),

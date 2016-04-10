@@ -45,19 +45,17 @@ function DocManager(comments,options){
 //        '</div>'+
         '<div style="float:right;">'+
         '<input type="submit" value="Отправить">'+
-        '<input type="reset" value="Отмена">'+
-        '</div>'+'<input name="command">';
+        '<input type="reset" value="Отмена">';
 
-    function editForm(parent,command,callback){
+    function editForm(parent,callback){
         form = document.createElement('form');
         form.innerHTML=formText;
         form.className='form-message';
-        form.command.value = command;
         form.user_id.value=user_id;
         form.topic_name.value=page;   
         
         form.onsubmit = function(){
-            callback(form);
+            callback(new FormData(this));
             parent.removeChild(form);
             form=null;
             return false;
@@ -216,7 +214,7 @@ function DocManager(comments,options){
             return;
         }
 
-        form = editForm(document.body,'add',function(f){
+        form = editForm(document.body,function(data){
             
             var request = Request(function(text){
                 
@@ -227,8 +225,9 @@ function DocManager(comments,options){
                 self.add_comments_button(d);
             });
 
+            data.append('command','add');
             request.open('POST',php_path+'proc.php');//'add_message.php');
-            request.send(new FormData(f));
+            request.send(data);
             
         });
     };
@@ -239,14 +238,15 @@ function DocManager(comments,options){
         
         var request = Request(function(text){
             
-            form = editForm(document.body,'edit',function(f){
+            form = editForm(document.body,function(data){
                 var r = Request(function(text){
                     comment_item.innerHTML = text;
                     self.add_comments_button(comment_item);
                 });
                 
+                data.append('command','edit');
                 r.open('POST',php_path+'proc.php');//'edit_message.php');
-                r.send(new FormData(f));
+                r.send(data);
                 
             });
             
@@ -264,7 +264,7 @@ function DocManager(comments,options){
     
     this.replay_comment=function(comment_item){        
         var comment_id = comment_item.children[0].getAttribute('data-comment-id');
-        form = editForm(document.body,'replay',function(f){
+        form = editForm(document.body,function(data){
             
             var request = Request(function(text){
                 var d = document.createElement('div');
@@ -274,8 +274,9 @@ function DocManager(comments,options){
                 self.add_comments_button(d);
             });
             
+            data.append('command','replay');
             request.open('POST',php_path+'proc.php');
-            request.send(new FormData(f));
+            request.send(data);
             
         });
         
