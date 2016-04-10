@@ -4,6 +4,8 @@ include '../connect.php';
 
 include_once './Parsedown.php';
 
+include './site-map.php';
+
 $command = filter_input(INPUT_POST,'command');
 if (isset($command)){
     switch ($command){

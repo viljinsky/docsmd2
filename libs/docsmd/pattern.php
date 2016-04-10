@@ -1,85 +1,9 @@
 <?php
-    
-    define('CR',"\n\r");
-    define('TAB',"\t");
-    
-    define('HOME', 'Начало');
-    define('NEXT','Вперёд');
-    define('PRIOR','Назад');
-    define('SITE_MAP', 'sitemap');
-    
 
     require_once  'Parsedown.php';
     
-    if (!file_exists($content_path.CONTENT_TPL)):
-        die($content_path.CONTENT_TPL.' - not found');
-    endif;
+    include_once 'site-map.php';
     
-
-    $map = getMap($content_path.CONTENT_TPL);
-    
-    
-    function getMap($filename){
-        $map = array();
-        $file = fopen($filename,'r');
-        $p = 0 ;
-        $last = 0;
-        $lastPage = null;
-        $L = array();
-         while ($str = fgets($file)){
-
-             if (trim($str)==='') { continue; }
-
-             $n = 0;
-             for ($i=0;$i<strlen($str);$i++){
-                 if($str[$i]!=' '){ break; }
-                 $n++;
-             }
-             $p = $n / 4;    
-
-             if ($p>$last){  array_push($L, $lastPage); }
-             for ($i=0;$i<$last-$p;$i++){
-                $lastPage = array_pop($L) ;
-             }
-
-             list($page,$title)=  explode('=', trim($str));
-             $page = trim($page);
-             if ($title===''){
-                 $title=$page;
-             } else {
-                 $title=  trim($title);
-             }
-             if (count($L)===0){
-                 $parent=null;
-             } else {
-                 $parent=$L[count($L)-1];
-             }
-             $lastPage = $page;
-
-             $last = $p;
-             $m = array('page'=>$page,'parent'=>$parent,'title'=>$title);
-             $map[] = $m;
-        }
-        fclose($file);
-        return $map;
-    }
-    
-    
-    
-    function recur($map,$page,$padding=''){
-        global $doc_page;
-        foreach ($map as $key=>$value){
-            if ($value['page']===$page){
-                echo $padding.'<a href="'.$doc_page.'?page='.$page.'" title="'.$page.'">'.$value['title'].'</a><br>';
-                break;
-            }
-        }
-        foreach ($map as $key=>$value){
-            if ($value['parent']===$page){
-                recur($map, $value['page'],$padding."\t");
-            }
-        }
-    }
 
     function messages($map){
         echo '<h1>Последние сообщения</h1>';
@@ -105,13 +29,6 @@
         echo '</pre>';
     }    
     
-    function getPage($map,$page){
-        foreach ($map as $value){
-            if ($value['page']===$page){
-                return $value;
-            }
-        }
-    }
     
     // получает все без парента
     function getIndex($map){
@@ -166,11 +83,9 @@
     
     function getNav($map,$serch){
         // ищем парент
-        global $doc_page;
 
-
-        $sitemap    = '<a href="'.$doc_page.'?page='.SITE_MAP.'">Карта справочника</a>';
-        $messages   = '<a href="'.$doc_page.'?page=messages">Пследние сообщения</a>';
+        $sitemap    = '<a href="'.DOC_PAGE.'?page='.SITE_MAP.'">Карта справочника</a>';
+        $messages   = '<a href="'.DOC_PAGE.'?page=messages">Пследние сообщения</a>';
         $findform = '<div style="display:inline; position:relative;right:0;"><input name="serch" placeholder="поиск на составительрасписания..."><button>Найти</button></div>';
         
         $home       = HOME;
@@ -180,10 +95,10 @@
         
         $a = nextPage2($map, $serch);
         if ($a['prior']!==null){
-                $prior = '<a href="'.$doc_page.'?page='.  $a['prior'].'">'.PRIOR.'</a>';            
+                $prior = '<a href="'.DOC_PAGE.'?page='.  $a['prior'].'">'.PRIOR.'</a>';            
         }
         if ($a['next']!==null){
-                $next = '<a href="'.$doc_page.'?page='.  $a['next'].'">'.NEXT.'</a>';
+                $next = '<a href="'.DOC_PAGE.'?page='.  $a['next'].'">'.NEXT.'</a>';
         }
         
         
@@ -204,7 +119,7 @@
             $path = '';
             while (!empty($m1['parent'])){
                 $m1=  getPage($map, $m1['parent']);
-                $path ='<a href="'.$doc_page.'?page='.$m1['page'].'">'.$m1['title'].'</a>'.(strlen($path)===0?'':' / ').$path;
+                $path ='<a href="'.DOC_PAGE.'?page='.$m1['page'].'">'.$m1['title'].'</a>'.(strlen($path)===0?'':' / ').$path;
             }
         }
         
@@ -213,20 +128,17 @@
         
         echo    CR.'<!-- page navigator -->'.CR
                 .'<ul class="page-navigator">'
-                .'<li><a href="'.$doc_page.'">Главная</a></li>'
+                .'<li><a href="'.DOC_PAGE.'">Главная</a></li>'
                 .'<li>'.$prior.'</li>'
                 .'<li>'.$next.'</li>'
                 .'<li>'.$path.'</li>'
                 .'</ul>'.CR
                 .'<!-- page navigator -->'.CR.CR;
-        
-        
-        
    }
    
-   function serch_form(){
+//   function serch_form(){
 //       echo '<form class="serch-form"><input name="word" placeholder="Поиск по сайту..." required><input type="submit" value="Найти" ></form>';
-   }
+//   }
    
    $page = filter_input(INPUT_GET,'page');
     
@@ -236,15 +148,13 @@
     * @global type $content_path
     */
    function page(){
-       global $map,$content_path,$page;
-
-
+       global $map,$page;
     
 //    echo '<h1>Руководство пользователя</h1>';
     
     getNav($map, $page);
     
-    serch_form();
+//    serch_form();
     
     if (!isset($page)){
         $page = DEFAULT_MD;    
@@ -259,7 +169,7 @@
     } else if ($page==='messages'){
         messages($map);
     } else {
-        $filename = $content_path.$page.'.md';
+        $filename = CONTENT_PATH.$page.'.md';
         if (!file_exists($filename)){
             echo '<div style="background:red;padding:50px;">Нстраница не найдена</div>';
 //            echo '<b>'.pageTitle($map,$page).'</b><br>';
@@ -268,7 +178,7 @@
         }  else {
             $parsedown = new Parsedown();
             $text = file_get_contents($filename);
-            $link = file_get_contents($content_path.'link.tpl');
+            $link = file_get_contents(CONTENT_PATH.'link.tpl');
             echo $parsedown->text($text."\n".$link);
         }
     }

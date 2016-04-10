@@ -13,7 +13,23 @@ and open the template in the editor.
         <script src="libs/docsmd/docseditor.js"></script>
     </head>
     <body>
+        <?php
+            session_start();
+            $tmp_role= filter_input(INPUT_GET,'role_id');
+            if (isset($tmp_role)){
+                $_SESSION['role_id']=$tmp_role;
+            }
+            if (!isset($_SESSION['role_id'])){
+                $_SESSION['role_id']=0;
+            }
+            $role_id = intval($_SESSION['role_id']);
+            
+            echo '<div> роле'.$role_id.'</div>';
+        ?>
         
+        <div id="admin">
+            <a href="./?role_id=0" >гость</a>&nbsp;<a href="./?role_id=1">пользователь</a>&nbsp;<a href="./?role_id=3">админ</a>
+        </div>
         
         <form id="searchform" class="search-form">
             <input name="search"  placeholder="Поиск по сайту..." required>
@@ -37,14 +53,16 @@ and open the template in the editor.
         
         <div id="adminmenu">
         <?php
-        include './libs/docsmd/admin-menu.php';
+            if ($role_id==3){
+                include './libs/docsmd/admin-menu.php';
+            }
         ?>
         </div>
         
         
         <script>
             
-                DocManager(comments,{php_path:'<?=$php_path?>',user_id:279,role_id:3});
+                DocManager(comments,{php_path:'<?=$php_path?>',user_id:279,role_id:'<?=$role_id?>'});
                 
                 Search(searchform,searchresult,'<?=$php_path?>');
                 
@@ -57,6 +75,7 @@ and open the template in the editor.
                     });
                     
         </script>
+        
         
     </body>
 </html>

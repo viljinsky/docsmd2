@@ -19,10 +19,11 @@ a:hover{text-decoration: underline;}
 
 img {max-width: 90%;}
 blockquote {background: #f0f0f0; padding: 10px; border: 1px solid #ccc;}
+pre { padding: 10px; border: 1px solid #ccc;background: yellow; font-family: Courier;}
+
 
 .upload_screenshort{ position: fixed;top:100px;left:100px;padding: 20px;border: 1px solid #ccc;background: #fff; box-shadow: 0 0 10px rgba(0,0,0,.5) ;}
 
-pre { padding: 10px; border: 1px solid #ccc;background: #f0f0f0;}
 
 .form-message{position: fixed;left: 100px;top:100px;border: 1px solid #ccc;box-shadow: 0 0 10px rgba(0,0,0,.5);padding: 10px; background: #fff;}
 

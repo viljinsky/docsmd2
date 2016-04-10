@@ -5,13 +5,13 @@ include_once '../config.php';
 
 if (!file_exists(CONTENT_PATH.CONTENT_TPL)){
     $txt = file_get_contents('test.txt');// "index;Содержание;\n    page1;page1;\n    page2;page2;\nimages;immages;\n    img_curriculum_small;curriculum_small";
-    $handle = fopen($content_path.CONTENT_TPL,'w');
+    $handle = fopen(CONTENT_PATH.CONTENT_TPL,'w');
     fwrite($handle, $txt);
     fclose($handle);
     echo 'Создан шаблон content.tpl<br>';
 }
 
-include './pattern.php';
+include './site-map.php';
 
 // почитать имена файлов изображений
 function image_list($image_path){

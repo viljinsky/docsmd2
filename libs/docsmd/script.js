@@ -13,7 +13,7 @@ function DocManager(comments,options){
     
     var php_path=options['php_path'];
     var user_id=options['user_id'];
-    var role_id=options['role_id'];
+    var role_id = options['role_id'];
     
     var page = 'index';
     var serch = location.search;
@@ -364,13 +364,17 @@ function DocManager(comments,options){
         var request = Request(function(response){
             comments.innerHTML = response;
             comments_inner=comments.querySelector('.comments-inner');
-            for (i=0;i<comments_inner.children.length;i++){
-                self.add_comments_button(comments_inner.children[i]);
+            if (role_id>0){
+                
+                for (i=0;i<comments_inner.children.length;i++){
+                    self.add_comments_button(comments_inner.children[i]);
+                }
+            
+                var button=document.createElement('button');
+                button.innerHTML='Новое сообщение';
+                button.onclick = self.append_comment;
+                comments.appendChild(button);
             }
-            var button=document.createElement('button');
-            button.innerHTML='Новое сообщение';
-            button.onclick = self.append_comment;
-            comments.appendChild(button);
         });
         request.open('POST',php_path+'proc.php');
         request.setRequestHeader('Content-Type','application/x-www-form-urlencoded');

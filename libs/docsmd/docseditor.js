@@ -28,7 +28,7 @@ function Search(search_form,result,php_path){
             var request = Request(function(){
                 result.innerHTML = request.responseText;
             });
-            request.open('POST', php_path+'/search.php');
+            request.open('POST', php_path+'/proc.php');
             var data = new FormData(this);
             data.append('command','search');
             request.send(data);
