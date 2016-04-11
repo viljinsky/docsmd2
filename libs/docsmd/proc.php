@@ -20,13 +20,10 @@ if (isset($command)){
             echo delete_message();
             break;
         case 'read':
-            readmessages();
+            read();
             break;
         case 'quotes':
             quotes();
-            break;
-        case 'upload_attach':
-            echo upload_attach();
             break;
         case 'upload_page':
             upload_page();
@@ -34,11 +31,65 @@ if (isset($command)){
         case 'search':
             search();
             break;
+        case 'comment-header':
+            comment_header();
+            break;
+        
+        case 'read-attachment':
+            read_attachment();
+            break;;
+        case 'delete-attachment':
+            delete_attachment();
+            break;
+        case 'upload-attach':
+            echo upload_attach();
+            break;
+        
+        case 'reload-item':
+            reload_item();
+            break;
+        
+        default :
+            echo "Command '".$command."' - not defined";
     }
 }
 
+function reload_item(){
+    $item_id= filter_input(INPUT_POST,'item_id');
+    read_message_item($item_id);
+}
 
-    function search(){
+function delete_attachment(){
+    global $screenshort_path;
+    $image_id = filter_input(INPUT_POST,'image_id');
+   $result = mysql_query("select src from topic_images where image_id=$image_id") or die(mysql_error());
+   if (mysql_num_rows($result)===1){
+       $data = mysql_fetch_array($result);
+       $src = $data['src'];
+       $filename = $screenshort_path.$src;
+       if (file_exists($filename)){
+           unlink($filename);
+       }
+       mysql_query("delete from topic_images where image_id=$image_id") or die(mysql_error());
+       echo " Файл ".$src.' '.(file_exists($filename)?'exists':'dont exists');
+   } else {
+       echo 'Имидж id='.$image_id.' - не найден';
+   }
+}
+    
+function comment_header(){
+        $item_id=  filter_input(INPUT_POST, 'item_id');
+        $sql="select a.comment_time,concat(u.last_name,' ',u.first_name),a.comment_text\n" 
+            ." from topic_item a inner join users u on a.user_id=u.user_id where a.item_id=$item_id;";
+        $result = mysql_query($sql) or die(mysql_error());
+        if ($result){
+            $data = mysql_fetch_array($result);
+            list($comment_time,$user_name,$text)=$data;
+            echo '{"error":0,"message":"OK","header":"    на сообщение '.$user_name.' от '.$comment_time.'"}';
+        }
+    }
+
+function search(){
         global $map;
         
         $word = urldecode(filter_input(INPUT_POST,'search'));
@@ -69,7 +120,6 @@ if (isset($command)){
         echo '<div>Всего найдено '.$count.'</div>';
     }
 
-
 /**
  * Загруска страицы документации
  * @return type
@@ -98,6 +148,10 @@ function upload_attach(){
     $tempfile = $_FILES['screenshort']['tmp_name'];
     $filename = urldecode($_FILES['screenshort']['name']);
 
+//    $mime_type =  mime_content_type($tempfile);    
+//    if ($mime_type!=='image/png'){
+//        return '{"error":56,"message":"Допускается загрузка только файлов png"}';
+//    }
     // закодированное имя файла
     $src = uniqid();
 
@@ -119,7 +173,6 @@ function upload_attach(){
 //    return '{"error":1,"message":"'.  mysql_error().'"}';
 }
 
-
 function quotes(){
     $item_id = filter_input(INPUT_POST,'item_id');
     $sql = "select comment_text from topic_item where item_id=$item_id";
@@ -134,24 +187,31 @@ function quotes(){
     echo '{"error":1,"message":"'.mysql_error().'","sql":"'.$sql.'"}';
 }
 
+function read_attachment(){
+    $item_id= filter_input(INPUT_POST, 'item_id');
+    return get_item_attachment($item_id);
+}
     
 function get_item_attachment($item_id){
     global $screenshort_link;
-    $html = '';
+    $html = '<div class="item-attachment">';
     $result = mysql_query("select image_id,filename,src from topic_images where item_id=$item_id") 
             or die("Ошибка get_item_images :"+  mysql_error());
-    if (mysql_num_rows($result)>0){
+    if (mysql_num_rows($result)===0){
+        $html.='<div>Нет прикреплений</div>';
+    } else {
         $html.='<div>Прикреплено</div>';
         while ($data=  mysql_fetch_array($result)){
             list($image_id,$filename,$src)=$data;
-            $html.="<div>$image_id $filename $src  <a href='".$screenshort_link.$src."' target='_blank'>$filename</a>"
-                 ."&nbsp;<a href='#' title='Удалить'>...</a>"
-                    . "</div>";
-
+            $html.='<div class="attach" data-attach-id="'.$image_id.'">'
+                 .'<a href="'.$screenshort_link.$src.'" target="_blank">'.$filename.'</a>'
+                 .'&nbsp;<button data-action="delete_attachment" >Удалить</button>'
+                 . '</div>';
         }
-        return $html;
     }
-    return '<div>нет прикреплений</div>';
+    $html.='<div><button data-action="add_attachment">Добавить</button></div>';
+    $html.='</div>';
+    return $html;
 }    
 
 function read_message_item($item_id){
@@ -185,7 +245,6 @@ function read_message_item($item_id){
 
 }
 
-
 function add_message(){
 
     $topic_name=  urldecode(filter_input(INPUT_POST,'topic_name'));
@@ -218,7 +277,6 @@ function add_message(){
 
 }
 
-
 function edit_message(){
 
     $item_id = filter_input(INPUT_POST,'item_id');
@@ -246,15 +304,8 @@ function delete_message(){
     }
 
 } 
-
-/**
- * Чтение списка сообщений
- * @return type
- */    
     
-
-    
-function readmessages(){
+function read(){
     
     $page = urldecode(filter_input(INPUT_POST, 'page'));
 
@@ -321,5 +372,4 @@ function readmessages(){
 
 }
 
-//----------------------------------------------------------------------------
     

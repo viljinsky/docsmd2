@@ -1,3 +1,16 @@
+function form_center(form){
+
+    var w = document.documentElement.clientWidth,
+        h= document.documentElement.clientHeight,
+        w1 = form.clientWidth,
+        h1 = form.clientHeight;
+
+    form.style.left= Math.floor((w-w1)/2)+'px';
+    form.style.top=Math.floor((h-h1)/2)+'px';
+}
+    
+
+
 /**
  * На документе должна быть форма класса auth
  * @param {type} comments
@@ -34,25 +47,32 @@ function DocManager(comments,options){
     var form = null;
 
     var formText = 'Ваше сообщение:<br>'+
-        '<button class="quotes">цитировать</button>'+
-        '<button class="screenshort">скриншорт</button><br>'+
         '<textarea rows="10" cols="100" name="message" class="user-message" required>Ответ на вопрос</textarea><br>'+
-//        '<div style="display:none;">'+
         'item_id <input name="item_id"><br>'+
         'replay_to <input name="replay_to"><br>'+
         'user_id <input name="user_id"><br>'+
         'topic_name <input name="topic_name"><br>'+
-//        '</div>'+
         '<div style="float:right;">'+
         '<input type="submit" value="Отправить">'+
-        '<input type="reset" value="Отмена">';
+        '<input type="reset" value="Отмена">'+
+        '</div>';
 
-    function editForm(parent,callback){
+    /**
+     * Форма редактирования сообщений
+     * @param {type} parent
+     * @param {type} callback
+     * @param {type} message
+     * @returns {DocManager.form|Element}
+     */    
+    function editForm(parent,callback,message){
         form = document.createElement('form');
         form.innerHTML=formText;
         form.className='form-message';
         form.user_id.value=user_id;
         form.topic_name.value=page;   
+        if (typeof message !=='undefined'){
+            form.message.innerHTML = message;
+        }
         
         form.onsubmit = function(){
             callback(new FormData(this));
@@ -69,12 +89,6 @@ function DocManager(comments,options){
         
         parent.appendChild(form);
         
-        form.querySelector('.screenshort').onclick=function(){
-            add_screen_short(form,form.item_id.value,function(){
-                alert('OK');
-            });
-            return false;
-        };
         return form;
     }
     
@@ -99,94 +113,66 @@ function DocManager(comments,options){
     };
     
 
-    // Функции добавить цитату и скриншорт
 
-
-    function send_screenshort(form,callback){
-        var request = Request(function(text){
-            console.log(text);
-            $a = JSON.parse(text);
-            if ($a['error']===0){
-                callback($a['image_id'],$a['filename'],$a['src']);
-                return;
-            }
-            alert('Какая-то ошибка!\n'+text);
-            
-        });
-        request.open('POST',php_path+'proc.php' );//'add_screenshort.php');
-        request.setRequestHeader('enctype','multipart/form-data');
-        request.send(new FormData(form));
-    }
-
-    function add_screen_short(element,item_id,callback){
+    /**
+     * Форма для добавления аттача
+     * @param {type} element
+     * @param {type} item_id
+     * @param {type} callback
+     * @returns {undefined}
+     */
+    function uploadForm(element,callback){
         var form = document.createElement('form');
-        form.method='POST';
         form.className='upload_screenshort';
-        form.action=php_path+'proc.php';//'add_screenshort.php';
-        form.enctype="multipart/form-data";
-        
         form.innerHTML= '<div><input type="file" name="screenshort" required></div>'
-                       +'<input name="command">' 
-                       +'item_id <input name="item_id">' 
+//                       +'item_id <input name="item_id">' 
                        +'<div style="float:right;">'
                        +'<input type="submit" value="Загрузить">'
-                       +'<button data-action="close">Отмена</button>'
+                       +'<input type="reset" value="Отмена">'
                        +'</div>';
                
-        form.item_id.value = item_id;// element.item_id.value;       
-        form.command.value='upload_attach';
+//        form.item_id.value = item_id;
         element.appendChild(form);
-        form.onclick=function(event){
-            if (event.target.tagName==='BUTTON'){
-                element.removeChild(form);
-                form=null;
-            }
-        };
+        form_center(form);
         
         form.onsubmit = function(){
-            send_screenshort(form,function(image_id,filename,src){
-                var user_message = element.querySelector(".user-message");
-                
-                var message = user_message.innerHTML
-                        +"\n["+filename+"]("+src+")\n";
-                
-                user_message.innerHTML = message;
-               
-//                msg.innerHTML = msg.innerHTML+"<br>"+'рисунок '+filename+'<br>'+
-//                        '<img src="'+src+'" alt="'+filename+'" title="'+filename+'">';
-                
-                
-            });
+            callback(new FormData(this));
+            element.removeChild(form);
+            form = null;
+            return false;
+        };
+        
+        form.reset = function(){
+            form=null;
             element.removeChild(form);
             return false;
         };
+        
+    }
+
+    
+    /**
+     * Получить заголовок сообщения пользователя
+     * @param {type} item_id
+     * @param {type} callback
+     * @returns {undefined}
+     */
+    this.get_comment_header = function (item_id,callback){
+        var request = Request(function(text){
+            console.log(text);
+            var a = JSON.parse(text);
+            if (a['error']===0){
+                callback(a['header']);
+            } else {
+                alert()
+            }
+        });
+        request.open('POST',php_path+'/proc.php');
+        request.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+        request.send('command=comment-header&item_id='+item_id);
+        
     }
     
-    
-    
-    
-    
-    //--------------------   new ----------------------
-    
-//    function Request(callback){
-//        var request = new XMLHttpRequest();
-//        request.onreadystatechange=function(){
-//            if (request.readyState===4){
-//                switch (request.status){
-//                    case 200:
-//                        callback(request.responseText);
-//                        return;
-//                    case 404:
-//                        alert('Страница не найдена');
-//                        return;
-//                    default:
-//                        alert(request.status+' Ошибка Request');
-//                }
-//            }
-//        };
-//        return request;
-//    }
-//    
     
     var comments_inner = comments.querySelector('.comments-inner');
     
@@ -207,6 +193,10 @@ function DocManager(comments,options){
         return comment_item;
     };
     
+    /**
+     * Новое сообщение пользователя
+     * @returns {undefined}
+     */
     this.append_comment=function(){
 
         if (user_id<0){
@@ -226,12 +216,18 @@ function DocManager(comments,options){
             });
 
             data.append('command','add');
-            request.open('POST',php_path+'proc.php');//'add_message.php');
+            request.open('POST',php_path+'proc.php');
             request.send(data);
             
         });
+        form_center(form);
     };
     
+    /**
+     * Пользователь хочет редактировать своё сообщение
+     * @param {type} comment_item
+     * @returns {undefined}
+     */
     this.edit_comment=function(comment_item){
         
         var comment_id = comment_item.children[0].getAttribute('data-comment-id');
@@ -254,6 +250,7 @@ function DocManager(comments,options){
             form.user_id.value=comment_item.children[0].getAttribute('data-user-id');
             form.message.innerHTML=text.replace(/<br>/g,"\n").replace(/\r/g,""); 
             document.body.appendChild(form);
+            form_center(form);
         });
         
         request.open('POST',php_path+'proc.php');
@@ -262,27 +259,41 @@ function DocManager(comments,options){
         
     };
     
+    /**
+     * Пользователь хочет ответить на сообщение другого пользователя
+     * @param {type} comment_item
+     * @returns {undefined}
+     */
     this.replay_comment=function(comment_item){        
         var comment_id = comment_item.children[0].getAttribute('data-comment-id');
-        form = editForm(document.body,function(data){
-            
-            var request = Request(function(text){
-                var d = document.createElement('div');
-                d.style.position='relative';
-                d.innerHTML=text;
-                comments_inner.insertBefore(d,comment_item.nextElementSibling);
-                self.add_comments_button(d);
-            });
-            
-            data.append('command','replay');
-            request.open('POST',php_path+'proc.php');
-            request.send(data);
-            
-        });
+        self.get_comment_header(comment_id,function(header){
         
-        form.replay_to.value=comment_id;
+            form = editForm(document.body,function(data){
+
+                var request = Request(function(text){
+                    var d = document.createElement('div');
+                    d.style.position='relative';
+                    d.innerHTML=text;
+                    comments_inner.insertBefore(d,comment_item.nextElementSibling);
+                    self.add_comments_button(d);
+                });
+
+                data.append('command','replay');
+                request.open('POST',php_path+'proc.php');
+                request.send(data);
+
+            },header);
+
+            form.replay_to.value=comment_id;
+            form_center(form);
+        });
     };
     
+    /**
+     * Пользователь хочет удалить своё сообщение
+     * @param {type} comment_item
+     * @returns {undefined}
+     */
     this.remove_comment=function(comment_item){
         
         var comment_id = comment_item.children[0].getAttribute('data-comment-id');
@@ -303,10 +314,84 @@ function DocManager(comments,options){
             request.send('command=delete&item_id='+comment_id);
         }
     };
+
+    /**
+     * Перезагрузка сообщения
+     * @param {type} comment_item
+     * @returns {undefined}
+     */
+    this.reload_item=function(comment_item){
+        var item_id=comment_item.children[0].getAttribute('data-comment-id');
+        var request = Request(function(text){
+//            var d = comment_item.parentElement;
+            comment_item.innerHTML =text;
+//            alert(text);
+        });
+        request.open('POST',php_path+'proc.php');
+        request.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+        request.send('command=reload-item&item_id='+item_id);
+        
+    };
     
+    /**
+     * Пользователь добавляет аттачмент к своему сообщению
+     * @param {type} comment_item
+     * @returns {undefined}
+     */
+    this.add_attachment=function(comment_item){
+        var item_id=comment_item.children[0].getAttribute('data-comment-id');
+        uploadForm(comment_item,function(data){
+            var request = Request(function(text){
+                console.log(text);
+                var a=JSON.parse(text);
+                if (a['error']===0){
+                    reload_item(comment_item);
+                } else {
+                    alert(text);
+                }    
+                
+            });
+            request.open('POST',php_path+'proc.php');
+            data.append('command','upload-attach');
+            data.append('item_id',item_id);
+            request.send(data);
+        });
+        return false;
+    };
+    
+    /**
+     * Пользователь удаляет аттачмент своего сообщения
+     * @param {type} comment_item
+     * @returns {undefined}
+     */
+    this.delete_attachment=function(comment_item,image_id){
+        if (confirm('Удалить прикреплённый файл')){
+            var request = Request(function(text){
+                console.log(text);
+                reload_item(comment_item);
+            });
+            request.open('POST',php_path+'proc.php');
+            request.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+            request.send('command=delete-attachment&image_id='+image_id);
+        }
+    };
+    
+    /**
+     * Обработсчик кнопок сообщения
+     *   добавить<br>
+     *   изменить<br>
+     *   ответить<br>
+     *   удалить<br>
+     *   
+     *   прикрепить файл<br>
+     *   удалить файл<br>
+     *     
+     * @param {type} event
+     * @returns {Boolean}
+     */
     this.comments_button_click=function(event){
         
-        if (user_id<0){
+        if (user_id<=0){
             alert('Необходимо войти');
             return false;
         }
@@ -314,23 +399,39 @@ function DocManager(comments,options){
         if (form===null){
             var target = event.target;
             var action = target.getAttribute('data-action');
-            self[action](this);
+            if (action==='delete_attachment'){
+                $image_id = target.closest('.attach').getAttribute("data-attach-id");
+                self.delete_attachment(this,$image_id);
+            } else {
+                self[action](this);
+            }
         }
     };
     
+    /**
+     * Добаление кнопок к сообщению
+     * @param {type} comments_item
+     * @returns {undefined}
+     */
     this.add_comments_button=function(comments_item){
         
         var buttons = document.createElement('div');
         buttons.className = 'comment-buttons';
         
         var button;
+        var issomeuser = user_id == comments_item.children[0].getAttribute('data-user-id');
+        var isadmin = (role_id===3);
+        
+        if (issomeuser || isadmin){
         
         button = document.createElement('button');
         button.innerHTML='Изменить';
         button.setAttribute('data-action','edit_comment');
         buttons.appendChild(button);
         
-        if (!comments_item.classList.contains('replay-to')){
+        }
+        
+        if (!comments_item.classList.contains('replay-to') && !issomeuser){
         
             button = document.createElement('button');
             button.innerHTML='Ответить';
@@ -338,10 +439,12 @@ function DocManager(comments,options){
             buttons.appendChild(button);
         }
         
-        button = document.createElement('button');
-        button.innerHTML='Удалить';
-        button.setAttribute('data-action','remove_comment');
-        buttons.appendChild(button);
+        if (issomeuser || isadmin){
+            button = document.createElement('button');
+            button.innerHTML='Удалить ('+comments_item.children[0].getAttribute('data-user-id')+')';
+            button.setAttribute('data-action','remove_comment');
+            buttons.appendChild(button);
+        }
         
         comments_item.appendChild(buttons);
         comments_item.onclick=self.comments_button_click;
@@ -360,9 +463,14 @@ function DocManager(comments,options){
         
     };
     
+    /**
+     * Чтение списка сообщений по теме
+     * @returns {undefined}
+     */
     this.read_comments = function(){
         
         var request = Request(function(response){
+            
             comments.innerHTML = response;
             comments_inner=comments.querySelector('.comments-inner');
             if (role_id>0){
@@ -376,6 +484,7 @@ function DocManager(comments,options){
                 button.onclick = self.append_comment;
                 comments.appendChild(button);
             }
+            
         });
         request.open('POST',php_path+'proc.php');
         request.setRequestHeader('Content-Type','application/x-www-form-urlencoded');

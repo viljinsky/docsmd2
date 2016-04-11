@@ -15,20 +15,29 @@ and open the template in the editor.
     <body>
         <?php
             session_start();
-            $tmp_role= filter_input(INPUT_GET,'role_id');
-            if (isset($tmp_role)){
-                $_SESSION['role_id']=$tmp_role;
+            $tmp_user = filter_input(INPUT_GET,'user_id');
+            if (isset($tmp_user)){
+                $_SESSION['user_id']=$tmp_user;
+                switch ($tmp_user){
+                    case 276: $_SESSION['role_id'] = 3; break;
+                    case 277: $_SESSION['role_id'] = 1; break;
+                    case 278: $_SESSION['role_id'] = 1; break;
+                    case 279: $_SESSION['role_id'] = 1; break;
+                    default : $_SESSION['role_id'] = -1;
+                }
             }
-            if (!isset($_SESSION['role_id'])){
+            if (!isset($_SESSION['user_id'])){
+                $_SESSION['user_id']=0;
                 $_SESSION['role_id']=0;
             }
+            $user_id = intval($_SESSION['user_id']);
             $role_id = intval($_SESSION['role_id']);
             
-            echo '<div> роле'.$role_id.'</div>';
+            echo '<div>user_id: '.$user_id.' role_id: '.$role_id.'</div>';
         ?>
         
         <div id="admin">
-            <a href="./?role_id=0" >гость</a>&nbsp;<a href="./?role_id=1">пользователь</a>&nbsp;<a href="./?role_id=3">админ</a>
+            <a href="./?user_id=276" >admin</a>&nbsp;<a href="./?user_id=277">Иванов</a>&nbsp;<a href="./?user_id=278">Петров</a><a href="./?user_id=-1">no user</a>
         </div>
         
         <form id="searchform" class="search-form">
@@ -62,7 +71,7 @@ and open the template in the editor.
         
         <script>
             
-                DocManager(comments,{php_path:'<?=$php_path?>',user_id:279,role_id:'<?=$role_id?>'});
+                DocManager(comments,{php_path:'<?=$php_path?>',user_id:<?=$user_id?>,role_id:<?=$role_id?>});
                 
                 Search(searchform,searchresult,'<?=$php_path?>');
                 

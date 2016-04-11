@@ -109,6 +109,7 @@ function Editor(element,options){
             return;
         };            
         document.body.appendChild(form);
+        form_center(form);
         return form;
     };
 
