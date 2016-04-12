@@ -1,6 +1,7 @@
 <?php
 
 include '../connect.php';
+include 'docsmd-config.php';
 
 include_once './Parsedown.php';
 
@@ -13,34 +14,43 @@ if (isset($command)){
         case 'replay':
             add_message();
             break;
+        
         case 'edit':
             edit_message();
             break;
+        
         case 'delete':
             echo delete_message();
             break;
+        
         case 'read':
             read();
             break;
+        
         case 'quotes':
             quotes();
             break;
+        
         case 'upload_page':
             upload_page();
             break;
+        
         case 'search':
             search();
             break;
+        
         case 'comment-header':
             comment_header();
             break;
         
         case 'read-attachment':
             read_attachment();
-            break;;
+            break;
+            
         case 'delete-attachment':
             delete_attachment();
             break;
+        
         case 'upload-attach':
             echo upload_attach();
             break;
@@ -323,8 +333,8 @@ function delete_message(){
         }
     }
 
-    $sql = "delete from topic_item where replay_to=$item_id";
-    mysql_query($sql);
+    $sql_delete = "delete from topic_item where replay_to=$item_id";
+    mysql_query($sql_delete);
 
     $sql = "delete from topic_item where item_id=$item_id";
     if (mysql_query($sql)){
@@ -342,28 +352,28 @@ function read(){
     
     $page = urldecode(filter_input(INPUT_POST, 'page'));
 
-    $sql = "select count(*),b.topic_id \n"
+    $sql_select_count = "select count(*),b.topic_id \n"
           ."from topic_item a inner join topic b on a.topic_id=b.topic_id \n"
           ."where b.topic_name='$page' group by b.topic_id";
-    $result = mysql_query($sql);
-    if (!$result){
-        echo '{"error":1,"message":"'.  mysql_error().'","sql":"'.$sql.'"}';
+    $result_1 = mysql_query($sql_select_count);
+    if (!$result_1){
+        echo '{"error":1,"message":"'.  mysql_error().'","sql":"'.$sql_select_count.'"}';
         return;
     }
-    if (mysql_num_rows($result)===0){
+    if (mysql_num_rows($result_1)===0){
         echo '<h2>Комментариев ещё никто не писал</h2>';
         echo '<div class="comments-inner">';
         echo '</div>';
         return;        
     }
 
-    $data = mysql_fetch_array($result);
+    $data = mysql_fetch_array($result_1);
     list($count,$topic_id)= $data;
 
 
     echo '<h2>Комментарии ('.$count.')</h2>';
 
-    $sql = "select "
+    $sql_select_items = "select "
           ." a.user_id,a.item_id,a.comment_time,a.comment_text,"
           ." concat(u.last_name,' ',u.first_name) as user_name,a.replay_to,b.topic_name,\n "
           ."(select count(*) from topic_item where user_id=a.user_id) as message_count \n"  
@@ -374,7 +384,7 @@ function read(){
 
     // echo $sql;
 
-    $result = mysql_query($sql) or die(mysql_error());
+    $result = mysql_query($sql_select_items) or die(mysql_error());
 
     $parse = new Parsedown();
 

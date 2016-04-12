@@ -20,7 +20,6 @@ function Request(callback){
                     alert(request.status+' Ошибка Request');
             }
         }
-        
     };
     return request;
 }
@@ -61,8 +60,8 @@ function Search(search_form,result,php_path){
  *    contenttpl  : '<?=CONTENT_TPL?>',<br>
  *    page        : '<?=$page?>.md',<br>
  *    linktpl     : '<?=LINK_TPL?>',<br>  
- *    contentlink : '<?=$server_link.'/md/'?>',<br>
- *    upload_php  : '<?=$php_path.'upload.php'?>'<br>
+ *    contentlink : '<?=CONTENT_LINK?>',<br>
+ *    php_path    : '<?=$php_path?>'<br>
  * 
  * 
  * 
@@ -74,53 +73,45 @@ function Editor(element,options){
     var page        = options['page'];
     var linktpl     = options['linktpl'];
     var contentlink = options['contentlink'];
-    var php_path  = options['php_path'];
+    var php_path    = options['php_path'];
 
     var form;
     var self=this;
-
-    this.save = function(){
-        var request = Request( function(text){
-            console.log(text)
-            var a = JSON.parse(text);
-            if (a['error']===0){
-                document.body.removeChild(form);
-                location.reload();
-                return;
-            };
-            alert(text);
-
-        });
-
-        request.open('POST',php_path+'proc.php');
-        request.send(new FormData(form));
-    };
-
-    this.cancel = function(){
-        document.body.removeChild(form);
-    };
-
 
     function execute(filename,text){
         form = document.createElement('form');
         form.className='editor';
         form.innerHTML =
-                '<div><input name="filename"><input name="command"></div>'
+                '<div><input name="filename"></div>'
                 +'<div><textarea name="text" cols="100" rows="25"></textarea></div>'
-                +'<div style="float:right;"><button data-action="save">Сохранить</button>'
-                +'<button data-action="cancel">Отмена</button></div>';
+                +'<div style="float:right;"><input type="submit" value="Сохранить">'
+                +'<input type="reset" value="Отмена"></div>';
         form.filename.value=filename;
-        form.command.value="upload_page";
         form.text.innerHTML = text;
-        form.onclick=function(event){
-            var target = event.target;
-            if (target.tagName==='BUTTON'){
-                var action = target.getAttribute('data-action');
-                self[action]();
-                return false;
-            }
-            return;
-        };            
+        form.onsubmit=function(){
+            var request = Request( function(text){
+                console.log(text)
+                var a = JSON.parse(text);
+                if (a['error']===0){
+                    document.body.removeChild(form);
+                    location.reload();
+                    return;
+                };
+                alert(text);
+            });
+
+            request.open('POST',php_path+'proc.php');
+            var data = new FormData(this);
+            data.append('command','upload_page');
+            request.send(data);
+            return false;
+            
+        };
+        form.onreset = function(){
+            document.body.removeChild(form);            
+            return false;
+        };
+        
         document.body.appendChild(form);
         form_center(form);
         return form;

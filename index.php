@@ -48,7 +48,7 @@ and open the template in the editor.
                 echo '<div>user_id: '.$user_id.' role_id: '.$role_id.'</div>';
             ?>
 
-            <div id="admin">
+            <div id="auth">
                 <a href="./?user_id=276" >admin</a>&nbsp;
                 <a href="./?user_id=277">Иванов</a>&nbsp;
                 <a href="./?user_id=278">Петрович</a>&nbsp;
@@ -87,7 +87,7 @@ and open the template in the editor.
         
         <footer>
            2016 &copy; Ильинский В.В.
-        <div id="adminmenu">
+        <div id="adminpanel">
         <?php
             if ($role_id==3){
                 include './libs/docsmd/admin-menu.php';
@@ -107,11 +107,11 @@ and open the template in the editor.
                 
                 Search(searchform,searchresult,'<?=$php_path?>');
                 
-                Editor(adminmenu,{
+                Editor(adminpanel,{
                     contenttpl  : '<?=CONTENT_TPL?>',
                     page        : '<?=$page?>.md',
                     linktpl     : '<?=LINK_TPL?>',   
-                    contentlink : '<?=$server_link.'/docs/'?>',
+                    contentlink : '<?=CONTENT_LINK?>',
                     php_path    : '<?=$php_path?>'
                 });
                     

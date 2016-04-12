@@ -2,6 +2,8 @@
 
     require_once  'Parsedown.php';
     
+    include 'docsmd-config.php';
+    
     include_once 'site-map.php';
     
     
