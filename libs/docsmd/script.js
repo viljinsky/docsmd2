@@ -140,7 +140,7 @@ function DocManager(comments,options){
             return false;
         };
         
-        form.reset = function(){
+        form.onreset = function(){
             form=null;
             element.removeChild(form);
             return false;
@@ -421,13 +421,18 @@ function DocManager(comments,options){
         var issomeuser = user_id == comments_item.children[0].getAttribute('data-user-id');
         var isadmin = (role_id===3);
         
+        if (issomeuser){
+            button = document.createElement('button');
+            button.innerHTML='Прикрепить файл';
+            button.setAttribute('data-action','add_attachment');
+            buttons.appendChild(button);
+        }
+        
         if (issomeuser || isadmin){
-        
-        button = document.createElement('button');
-        button.innerHTML='Изменить';
-        button.setAttribute('data-action','edit_comment');
-        buttons.appendChild(button);
-        
+            button = document.createElement('button');
+            button.innerHTML='Изменить';
+            button.setAttribute('data-action','edit_comment');
+            buttons.appendChild(button);
         }
         
         if (!comments_item.classList.contains('replay-to') && !issomeuser){
@@ -440,14 +445,13 @@ function DocManager(comments,options){
         
         if (issomeuser || isadmin){
             button = document.createElement('button');
-            button.innerHTML='Удалить ('+comments_item.children[0].getAttribute('data-user-id')+')';
+            button.innerHTML='Удалить';// ('+comments_item.children[0].getAttribute('data-user-id')+')';
             button.setAttribute('data-action','remove_comment');
             buttons.appendChild(button);
         }
         
         comments_item.appendChild(buttons);
         comments_item.onclick=self.comments_button_click;
-
         
         
 //        buttons.style.display = 'none';

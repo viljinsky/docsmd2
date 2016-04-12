@@ -12,10 +12,10 @@
         die(CONTENT_TPL.CONTENT_TPL.' - not found');
     endif;
     
-
     $map = getMap(CONTENT_PATH.CONTENT_TPL);
     
     function getPage($map,$page){
+        
         foreach ($map as $value){
             if ($value['page']===$page){
                 return $value;
@@ -24,19 +24,20 @@
     }
 
     function recur($map,$page,$padding=''){
+        
         foreach ($map as $key=>$value){
             if ($value['page']===$page){
                 echo $padding.'<a href="'.DOC_PAGE.'?page='.$page.'" title="'.$page.'">'.$value['title'].'</a><br>';
                 break;
             }
         }
+        
         foreach ($map as $key=>$value){
             if ($value['parent']===$page){
                 recur($map, $value['page'],$padding."\t");
             }
         }
     }
-    
     
     function getMap($filename){
         $map = array();
@@ -61,10 +62,10 @@
                 $lastPage = array_pop($L) ;
              }
 
-             list($page,$title)=  explode('=', trim($str));
-             $page = trim($page);
+             list($tmp_page,$title)=  explode('=', trim($str));
+             $page = trim($tmp_page);
              if ($title===''){
-                 $title=$page;
+                 $title=$tmp_page;
              } else {
                  $title=  trim($title);
              }
@@ -95,5 +96,16 @@
         }
         return $result;
     }
+    
+//------------------------------------------------------------------------------
+    function sitemap($map){
+        echo '<h1>Карта справочника</h1><pre>';
+        foreach ($map as $value){
+            if (empty($value['parent'])){
+                recur($map, $value['page']);
+            }
+        }
+        echo '</pre>';
+    }    
     
 

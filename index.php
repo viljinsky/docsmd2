@@ -63,18 +63,24 @@ and open the template in the editor.
                 <input type="submit" value="Найти" >
             </form> 
 
-            <div id="searchresult"></div>
 
 
             <?php
             include './libs/config.php';
             include './libs/docsmd/pattern.php';
-            echo page();
             ?>
+            
+            
+            <?php document_navigator(); ?>
+            
+            <div id="searchresult">            
+                
+                <?php document_page(); ?>
 
-
-
-            <div id="comments" class="comments"></div>
+                <div id="comments" class="comments"></div>
+            
+            </div>
+            
             <div class="hfooter"></div>
         
         </div>

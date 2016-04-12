@@ -4,16 +4,6 @@
     
     include_once 'site-map.php';
     
-    function sitemap($map){
-        echo '<h1>Карта справочника</h1><pre>';
-        foreach ($map as $value){
-            if (empty($value['parent'])){
-                recur($map, $value['page']);
-            }
-        }
-        echo '</pre>';
-    }    
-    
     
     // получает все без парента
     function getIndex($map){
@@ -23,19 +13,6 @@
             endif;            
         endforeach;
     }
-    
-//    function getContent($map,$serch){
-//        $result = '';
-//        foreach ($map as $key=>$a):
-//            if ($a['parent']===$serch):
-//                $result .= '* ['.$a['title'].']['.$a['page'].']'."\n";
-//            endif;
-//        endforeach;
-//        if (strlen($result)>0){
-//            $result = CR.CR."В этой главе следующие разделы".CR.CR.$result;
-//        }
-//        return $result;
-//    }
     
     function pageTitle($map,$serach){
         foreach ($map as $key=>$a){
@@ -65,8 +42,10 @@
         return array('next'=>$nextPage,'prior'=>$priorPage);
     }
 
+    $page = filter_input(INPUT_GET,'page');
     
-    function getNav($map,$serch){
+    function document_navigator(){
+        global $map,$page;
         // ищем парент
 
         $sitemap    = '<a href="'.DOC_PAGE.'?page='.SITE_MAP.'">Карта справочника</a>';
@@ -75,7 +54,7 @@
         $next       = NEXT;
         $path       = '';
         
-        $a = nextPage2($map, $serch);
+        $a = nextPage2($map, $page);
         if ($a['prior']!==null){
                 $prior = '<a href="'.DOC_PAGE.'?page='.  $a['prior'].'">'.PRIOR.'</a>';            
         }
@@ -83,7 +62,7 @@
                 $next = '<a href="'.DOC_PAGE.'?page='.  $a['next'].'">'.NEXT.'</a>';
         }
         
-        if (isset($serch) && ($m1 = getPage($map, $serch))){
+        if (isset($page) && ($m1 = getPage($map, $page))){
             
             // родственники серча
             $a=array();
@@ -113,19 +92,18 @@
                 .'<!-- page navigator -->'.CR.CR;
    }
    
-   $page = filter_input(INPUT_GET,'page');
     
    /**
     * Вывод страницы документации
     * @global type $map
     * @global type $content_path
     */
-   function page(){
+   function document_page(){
        global $map,$page;
     
 //    echo '<h1>Руководство пользователя</h1>';
     
-    getNav($map, $page);
+//    getNav($map, $page);
     
 //    serch_form();
     

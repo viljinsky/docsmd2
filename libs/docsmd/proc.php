@@ -212,7 +212,7 @@ function get_item_attachment($item_id){
                  . '</div>';
         }
     }
-    $html.='<div><button data-action="add_attachment">Добавить файл</button></div>';
+//    $html.='<div><button data-action="add_attachment">Добавить файл</button></div>';
     $html.='</div>';
     return $html;
 }    
