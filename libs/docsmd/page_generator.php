@@ -1,6 +1,7 @@
 <?php
 
 include_once '../config.php';
+include './docsmd-config.php';
 
 
 if (!file_exists(CONTENT_PATH.CONTENT_TPL)){
