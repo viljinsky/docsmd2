@@ -24,6 +24,8 @@ function form_center(form){
  */
 function DocManager(comments,options){
     
+    var comments_inner = comments.querySelector('.comments-inner');
+    
     var php_path=options['php_path'];
     var user_id=options['user_id'];
     var role_id = options['role_id'];
@@ -40,7 +42,6 @@ function DocManager(comments,options){
             }
         }
     }
-//    console.log('page : '+page+' user_id : '+user_id+' role_id : '+role_id);
     
     
     var self = this;
@@ -100,7 +101,7 @@ function DocManager(comments,options){
     this.goup =function(element){
         var item_id = element.getAttribute('data-replay-to');
         
-        for(i=0;i<comments.children.length;i++){
+        for(var i=0;i<comments.children.length;i++){
             var el = comments.children[i];
             if (el.hasAttributes('data-id') && el.getAttribute('data-id')==item_id){
                 if (el!==null){
@@ -124,14 +125,11 @@ function DocManager(comments,options){
     function uploadForm(element,callback){
         var form = document.createElement('form');
         form.className='upload_screenshort';
-        form.innerHTML= '<div><input type="file" name="screenshort" required></div>'
-//                       +'item_id <input name="item_id">' 
+        form.innerHTML= '<div style="padding:10px;"><div><input type="file" name="screenshort" required></div></div>'
                        +'<div style="float:right;">'
                        +'<input type="submit" value="Загрузить">'
                        +'<input type="reset" value="Отмена">'
                        +'</div>';
-               
-//        form.item_id.value = item_id;
         element.appendChild(form);
         form_center(form);
         
@@ -174,7 +172,6 @@ function DocManager(comments,options){
     }
     
     
-    var comments_inner = comments.querySelector('.comments-inner');
     
     this.add_comment=function(){
         var comment_item = document.createElement('div');
@@ -301,6 +298,7 @@ function DocManager(comments,options){
         if (confirm('Удалить сообщение '+comment_id)){
         
             var request= Request(function(text){
+                console.log(text);
                 var a = JSON.parse(text);
                 if (a['error']===0){
                     comments_inner.removeChild(comment_item);
@@ -399,6 +397,7 @@ function DocManager(comments,options){
         if (form===null){
             var target = event.target;
             var action = target.getAttribute('data-action');
+            console.log(' action ->'+action);
             if (action==='delete_attachment'){
                 $image_id = target.closest('.attach').getAttribute("data-attach-id");
                 self.delete_attachment(this,$image_id);

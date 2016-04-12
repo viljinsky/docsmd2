@@ -172,7 +172,10 @@ function upload_attach(){
     } 
 //    return '{"error":1,"message":"'.  mysql_error().'"}';
 }
-
+/**
+ * Чтение содержиого сообщения
+ * @return type
+ */
 function quotes(){
     $item_id = filter_input(INPUT_POST,'item_id');
     $sql = "select comment_text from topic_item where item_id=$item_id";
@@ -209,11 +212,15 @@ function get_item_attachment($item_id){
                  . '</div>';
         }
     }
-    $html.='<div><button data-action="add_attachment">Добавить</button></div>';
+    $html.='<div><button data-action="add_attachment">Добавить файл</button></div>';
     $html.='</div>';
     return $html;
 }    
 
+/**
+ * Чтение обного сообщения - содержиого элемента comment
+ * @param type $item_id
+ */
 function read_message_item($item_id){
 
     $parse = new Parsedown();
@@ -245,12 +252,15 @@ function read_message_item($item_id){
 
 }
 
+/**
+ * Добавление сообщения
+ */
 function add_message(){
 
-    $topic_name=  urldecode(filter_input(INPUT_POST,'topic_name'));
-    $message = htmlspecialchars(urldecode(filter_input(INPUT_POST, 'message')),ENT_QUOTES);
-    $user_id = filter_input(INPUT_POST, 'user_id');
-    $replay_to = filter_input(INPUT_POST,'replay_to');
+    $topic_name = urldecode(filter_input(INPUT_POST,'topic_name'));
+    $message    = htmlspecialchars(urldecode(filter_input(INPUT_POST, 'message')),ENT_QUOTES);
+    $user_id    = filter_input(INPUT_POST, 'user_id');
+    $replay_to  = filter_input(INPUT_POST,'replay_to');
 
     if (!isset($replay_to) || $replay_to===''):
         $replay_to='null';
@@ -260,10 +270,12 @@ function add_message(){
     if (mysql_num_rows($result)===0){
         $sql = "insert into topic (topic_name) values('$topic_name')";
         mysql_query($sql) or die('sql: '.$sql."\n message: ".mysql_error());
-        $sql = "select max(topic_id) from topic";
-        $result = mysql_query($sql) or die("sql: ".$sql."\n message:".mysql_error());
+        $topic_id = mysql_insert_id();
+//        $sql = "select max(topic_id) from topic";
+//        $result = mysql_query($sql) or die("sql: ".$sql."\n message:".mysql_error());
+    } else {
+        list($topic_id) = mysql_fetch_array($result);
     }
-    list($topic_id) = mysql_fetch_array($result);
 
     $sql = "insert into topic_item (topic_id,replay_to,comment_text,user_id) "
           ."values ($topic_id,$replay_to,'$message',$user_id)";
@@ -276,7 +288,10 @@ function add_message(){
     read_message_item($item_id);
 
 }
-
+/**
+ * Редактирование сообщения
+ * @return type
+ */
 function edit_message(){
 
     $item_id = filter_input(INPUT_POST,'item_id');
@@ -291,20 +306,38 @@ function edit_message(){
 }
 
 function delete_message(){
+    global $screenshort_path;
     $item_id= filter_input(INPUT_POST,'item_id');
+    
+    // физическое удаление изображений пользователя
+    $result = mysql_query("select src from topic_images where item_id=$item_id") or die(mysql_error());
+    $deleted = '';
+    while ($data =  mysql_fetch_array($result)){
+        $deleted=$data['src'];
+        $filename = $screenshort_path.$data['src'];
+        if (file_exists($filename)){
+            $deleted.=' - OK ';
+            unlink($filename);
+        } else {
+            $deleted.=' - Fail';
+        }
+    }
 
     $sql = "delete from topic_item where replay_to=$item_id";
     mysql_query($sql);
 
     $sql = "delete from topic_item where item_id=$item_id";
     if (mysql_query($sql)){
-        return '{"error":0,"message":"Сообщение удалено"}';
+        return '{"error":0,"message":"Сообщение успешно удалено","deleted":"'.$deleted.'"}';
     } else {
         return '{"error":1,"sql":"'.$sql.'","message":"'.mysql_error().'"}';
     }
 
 } 
-    
+/**
+ * Чтение списка сообщений
+ * @return type
+ */    
 function read(){
     
     $page = urldecode(filter_input(INPUT_POST, 'page'));
@@ -361,7 +394,7 @@ function read(){
         }
 
 //------------------- topic item ----------------------------        
-        echo '<div style="position:relative;">';
+        echo '<div class="comment">';
         include './message_text.php';
         echo get_item_attachment($item_id);
         echo '</div>';

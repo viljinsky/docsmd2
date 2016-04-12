@@ -1,6 +1,13 @@
+/**
+ * Глобальный XMLHttpRequest
+ * 
+ * @param {type} callback
+ * @returns {Request.request|XMLHttpRequest}
+ */
 function Request(callback){
     var request = new XMLHttpRequest();
     request.onreadystatechange=function(){
+        
         if (request.readyState===4){
             switch (request.status){
                 case 200:
@@ -13,14 +20,20 @@ function Request(callback){
                     alert(request.status+' Ошибка Request');
             }
         }
+        
     };
     return request;
 }
 
-
-/**     Поиск по документации 
+/**
  * 
- **/
+ * Поиск странициы документации
+ * 
+ * @param {type} search_form
+ * @param {type} result
+ * @param {type} php_path
+ * @returns {undefined}
+ */
 function Search(search_form,result,php_path){
     if (search_form!==null){
 

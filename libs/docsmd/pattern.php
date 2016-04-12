@@ -4,21 +4,6 @@
     
     include_once 'site-map.php';
     
-
-    function messages($map){
-        echo '<h1>Последние сообщения</h1>';
-        $sql = "select message_id,message_text,user_id from topic_item";
-//        $result = mysql_query($sql);
-//        if ($result){
-//            while ($data=  mysql_fetch_array($result)){
-//                list($item_id,$message,$user_id) = $data;
-//                echo $item_id.' '.$message.' '.$user_id;
-//            }
-//        }
-        
-        return;
-    }
-    
     function sitemap($map){
         echo '<h1>Карта справочника</h1><pre>';
         foreach ($map as $value){
@@ -32,7 +17,7 @@
     
     // получает все без парента
     function getIndex($map){
-        foreach ($map as $key=>$a):
+        foreach ($map as $a):
             if (empty($a['parent'])):
                 echo '<a href="?page='.$a['page'].'">'.$a['title'].'</a></br>';
             endif;            
@@ -85,10 +70,7 @@
         // ищем парент
 
         $sitemap    = '<a href="'.DOC_PAGE.'?page='.SITE_MAP.'">Карта справочника</a>';
-        $messages   = '<a href="'.DOC_PAGE.'?page=messages">Пследние сообщения</a>';
-        $findform = '<div style="display:inline; position:relative;right:0;"><input name="serch" placeholder="поиск на составительрасписания..."><button>Найти</button></div>';
-        
-        $home       = HOME;
+
         $prior      = PRIOR;
         $next       = NEXT;
         $path       = '';
@@ -101,20 +83,16 @@
                 $next = '<a href="'.DOC_PAGE.'?page='.  $a['next'].'">'.NEXT.'</a>';
         }
         
-        
         if (isset($serch) && ($m1 = getPage($map, $serch))){
-            
-//            $home = '<a href="?page='.$m1['parent'].'">home</a>';
             
             // родственники серча
             $a=array();
             $n = 0;
-            foreach ($map as $key=>$m2){
+            foreach ($map as $m2){
                 if ($m1['parent']===$m2['parent']){
                     $a[$m2['page']]=$n++;
                 }
             }
-
             
             $path = '';
             while (!empty($m1['parent'])){
@@ -125,7 +103,6 @@
         
         echo '<div>'.$sitemap.'</div>'.CR;
         
-        
         echo    CR.'<!-- page navigator -->'.CR
                 .'<ul class="page-navigator">'
                 .'<li><a href="'.DOC_PAGE.'">Главная</a></li>'
@@ -135,10 +112,6 @@
                 .'</ul>'.CR
                 .'<!-- page navigator -->'.CR.CR;
    }
-   
-//   function serch_form(){
-//       echo '<form class="serch-form"><input name="word" placeholder="Поиск по сайту..." required><input type="submit" value="Найти" ></form>';
-//   }
    
    $page = filter_input(INPUT_GET,'page');
     

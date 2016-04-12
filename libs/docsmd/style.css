@@ -8,7 +8,9 @@ a:hover{text-decoration: underline;}
 .warning{padding:20px;background:#ccc;}
 .attantion{padding:20px;background:#f0f0f0;}
 
-.comment-item {padding: 20px;margin: 0 auto; border:1px solid #ccc;margin-bottom: 5px;}
+.comments {background: #f0f0f0; padding: 20px; margin: 0 20px;}
+.comment {position: relative;}
+.comment-item {padding: 20px;margin: 0 auto; border:1px solid #ccc;margin-bottom: 5px; background: #fff;}
 .comment-item ul {list-style: none;}
 .comment-item .btn {display: inline-block;margin-right: 10px;cursor: pointer;}
 .comment-item .btn:hover{text-decoration: underline; color:#5555dd;}
@@ -16,6 +18,8 @@ a:hover{text-decoration: underline;}
 [data-replay-to]{margin-left: 50px;}
 
 .comment-buttons {position: absolute ; right: 0; top:0;}
+
+.item-attachment {margin-bottom: 20px;}
 
 img {max-width: 90%;}
 blockquote {background: #f0f0f0; padding: 10px; border: 1px solid #ccc;}

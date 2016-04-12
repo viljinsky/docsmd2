@@ -1,24 +1,61 @@
 <?php
 
-# Настройки сервера базы данных
+//------------------------------------------------------------------------------
+//
+//                  Настройки сервера базы данных
+//
+//------------------------------------------------------------------------------
+
 
 define('HOST', 'localhost');
 define('USER', 'test3');
 define('PASSWORD', 'test3');
 define('DATABASE','docsmd');
 
-# Настройки документации
-
 
 /** Ссылка на сайт */
 $server_link='//localhost/docsmd2/';
 
-
 /** Путь сервера к папке сайта */
-//$server_path=dirname(__FILE__).DIRECTORY_SEPARATOR;
-//$server_path="D:\\development\\web\php\\parsetest\\";
-$server_path = "d:\\development\\web\php\\docsmd2\\" ;//$_SERVER['DOCUMENT_ROOT'].'docsmd'.DIRECTORY_SEPARATOR;
+$server_path = "d:\\development\\web\php\\docsmd2\\" ;
 
+//------------------------------------------------------------------------------
+//
+//                           Настройки документации
+//                           
+//                server_link
+//                    |
+//                    |--docs
+//                    |    |
+//                    |    +----images
+//                    |    |
+//                    |    +----tmp
+//                    |    |
+//                    |    +----index.md
+//                    |    +----content.tpl
+//                    |    +----link.tpl
+//                    |    |
+//                    |    +----*.md  
+//                    |    +----*.md  
+//                    |
+//                    +--libs
+//                    |    |
+//                    |    +--connect.php
+//                    |    |
+//                    |    +--config.php
+//                    |    |
+//                    |    +--docsmd
+//                    |    |    |
+//                    |    |    +---- *.php
+//                    |    |    +---- *.php
+//                    |    |
+//                    |    +--auth
+//                    |    |    |
+//                    |    |    +---- *.php
+//                    |    |    +---- *.php
+//                    |
+//                    +---index.php             
+//                           
 //------------------------------------------------------------------------------
 
 /**Путь к библиотеке документации*/ 

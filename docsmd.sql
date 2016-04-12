@@ -86,10 +86,14 @@ insert into user_role values (0,'guest'),
     (3,'admin'),
     (2,'user');
 
+delete from users;
+
 insert into users (user_id,login,email,pwd,last_name,first_name,role_id) 
-    values (277,'admin','user277@mail.ru','1','Ильинский','Вадим',3),
-           (278,'user','user278@mail.ru','1','Петров','Василий',0),
-           (279,'guest','user279@mail.ru','1','Романов','Игорь',2)
+    values
+           (276,'admin','user277@mail.ru','1','Ильинский','Вадим',3),
+           (277,'ivanov','ivanov@mail.ru','1','Иванов','Рома',3),
+           (278,'petrov','petrov@mail.ru','1','Петров','Василий',0),
+           (279,'sidorov','sidorov@mail.ru','1','Сидоров','Игорь',2)
 ;
 
 
