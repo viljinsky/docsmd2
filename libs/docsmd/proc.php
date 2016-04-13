@@ -70,13 +70,13 @@ function reload_item(){
 }
 
 function delete_attachment(){
-    global $screenshort_path;
+//    global $screenshort_path;
     $image_id = filter_input(INPUT_POST,'image_id');
    $result = mysql_query("select src from topic_images where image_id=$image_id") or die(mysql_error());
    if (mysql_num_rows($result)===1){
        $data = mysql_fetch_array($result);
        $src = $data['src'];
-       $filename = $screenshort_path.$src;
+       $filename = ATTACH_PATH.$src;
        if (file_exists($filename)){
            unlink($filename);
        }
@@ -153,7 +153,7 @@ function upload_page(){
 }
 
 function upload_attach(){
-    global $screenshort_link,$screenshort_path;
+//    global $screenshort_path;
     $item_id = filter_input(INPUT_POST,'item_id');
     $tempfile = $_FILES['screenshort']['tmp_name'];
     $filename = urldecode($_FILES['screenshort']['name']);
@@ -165,7 +165,7 @@ function upload_attach(){
     // закодированное имя файла
     $src = uniqid();
 
-    if ( move_uploaded_file($tempfile,$screenshort_path.$src)){
+    if ( move_uploaded_file($tempfile,ATTACH_PATH.$src)){
 
 
         $sql = "insert into topic_images (item_id,src,filename) \n"
@@ -177,7 +177,7 @@ function upload_attach(){
             return '{"error"   : 0,"message":"OK",'
                    .'"image_id": '.$image_id.','
                    .'"filename": "'.$filename.'",'
-                   .'"src"     : "'.$screenshort_link.$src.'" }';
+                   .'"src"     : "'.ATTACH_LINK.$src.'" }';
         } 
     } 
 //    return '{"error":1,"message":"'.  mysql_error().'"}';
@@ -206,7 +206,7 @@ function read_attachment(){
 }
     
 function get_item_attachment($item_id){
-    global $screenshort_link;
+//    global $screenshort_link;
     $html = '<div class="item-attachment">';
     $result = mysql_query("select image_id,filename,src from topic_images where item_id=$item_id") 
             or die("Ошибка get_item_images :"+  mysql_error());
@@ -217,7 +217,7 @@ function get_item_attachment($item_id){
         while ($data=  mysql_fetch_array($result)){
             list($image_id,$filename,$src)=$data;
             $html.='<div class="attach" data-attach-id="'.$image_id.'">'
-                 .'<a href="'.$screenshort_link.$src.'" target="_blank">'.$filename.'</a>'
+                 .'<a href="'.ATTACH_LINK.$src.'" target="_blank">'.$filename.'</a>'
                  .'&nbsp;<button data-action="delete_attachment" >Удалить</button>'
                  . '</div>';
         }
@@ -316,7 +316,7 @@ function edit_message(){
 }
 
 function delete_message(){
-    global $screenshort_path;
+//    global $screenshort_path;
     $item_id= filter_input(INPUT_POST,'item_id');
     
     // физическое удаление изображений пользователя
@@ -324,7 +324,7 @@ function delete_message(){
     $deleted = '';
     while ($data =  mysql_fetch_array($result)){
         $deleted=$data['src'];
-        $filename = $screenshort_path.$data['src'];
+        $filename = ATTACH_PATH.$data['src'];
         if (file_exists($filename)){
             $deleted.=' - OK ';
             unlink($filename);

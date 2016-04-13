@@ -68,9 +68,9 @@ function page_generator($map){
 }
 
 function image_generator($map){
-    global $image_path,$image_path_link;
+//    global $image_path_link;
     // Создать страницы
-    $image_list = image_list($image_path);
+    $image_list = image_list(IMAGE_PATH);
     foreach ($image_list as $image):
         $pp = getPage($map, $image);
         if ($pp===null){
@@ -100,7 +100,7 @@ function image_generator($map){
         if ($pp===null){
             continue;
         }
-        fwrite($f, '['.$image.'.png]: '."\t\t\t".$image_path_link.$image.'.png'.' "'.$pp['title'].'"'."\n");
+        fwrite($f, '['.$image.'.png]: '."\t\t\t".IMAGE_LINK.$image.'.png'.' "'.$pp['title'].'"'."\n");
     endforeach;
     fclose($f);
 
